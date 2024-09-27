@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .start-btn {
+            background-color: green;
+            color: white;
+        }
+        .stop-btn {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <label id="time-label">00:00:00</label>
+        <div>
+            <button id="start-stop" class="start-btn">Start</button>
+            <button id="lap-reset" class="lap-btn">Lap</button>
+        </div>
+        <ul id="lap-list"></ul>
+    </div>
+
+    <script>
+        let timer;
+        let isRunning = false;
+        let elapsedTime = 0; // in seconds
+
+        const timeLabel = document.getElementById('time-label');
+        const startStopButton = document.getElementById('start-stop');
+        const lapResetButton = document.getElementById('lap-reset');
+        const lapList = document.getElementById('lap-list');
+
+        function updateTimeLabel() {
+            const hours = String(Math.floor(elapsedTime / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, '0');
+            const seconds = String(elapsedTime % 60).padStart(2, '0');
+            timeLabel.innerText = `${hours}:${minutes}:${seconds}`;
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                elapsedTime++;
+                updateTimeLabel();
+            }, 1000);
+            isRunning = true;
+            startStopButton.innerText = 'Stop';
+            startStopButton.className = 'stop-btn';
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            startStopButton.innerText = 'Start';
+            startStopButton.className = 'start-btn';
+            lapResetButton.innerText = 'Reset';
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            elapsedTime = 0;
+            updateTimeLabel();
+            lapList.innerHTML = ''; // Clear lap times
+            lapResetButton.innerText = 'Lap';
+            startStopButton.innerText = 'Start';
+            startStopButton.className = 'start-btn';
+            isRunning = false;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+            lapResetButton.onclick = isRunning ? () => resetTimer() : resetTimer;
+        }
+
+        function lapTime() {
+            if (isRunning) {
+                const lapTime = timeLabel.innerText;
+                const lapItem = document.createElement('li');
+                lapItem.innerText = lapTime;
+                lapList.prepend(lapItem);
+            }
+        }
+
+        startStopButton.onclick = toggleTimer;
+        lapResetButton.onclick = lapTime;
+    </script>
+</body>
+</html>
